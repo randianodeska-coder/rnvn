@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNVN | Premium Streetwear</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --bg: #030303;
+            --surface: #0a0a0a;
+            --text: #ffffff;
+            --text-dim: #888888;
+            --accent: #ffffff;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        h1, h2, h3, h4, .brand-font { font-family: 'Outfit', sans-serif; text-transform: uppercase; }
+        
+        /* Preloader */
+        .preloader {
+            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .preloader-text {
+            font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; letter-spacing: 0.5rem;
+            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%);
+            transform: translateY(50px);
+        }
+        
+        /* Navbar */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 1.5rem 4rem; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(3, 3, 3, 0.4); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            transition: transform 0.4s ease;
+        }
+        nav .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: 0.2rem; text-decoration: none; color: var(--text); }
+        nav ul { display: flex; gap: 2.5rem; list-style: none; }
+        nav a { color: var(--text-dim); text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1rem; transition: color 0.3s; }
+        nav a:hover { color: var(--text); }
+
+        /* Hero */
+        .hero {
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden; perspective: 1000px;
+        }
+        .hero-bg {
+            position: absolute; inset: -5%; width: 110%; height: 110%;
+            background: url('WhatsApp Image 2026-03-20 at 21.58.30.jpeg') center/cover no-repeat;
+            opacity: 0.5; filter: blur(4px) brightness(0.5);
+            transform: translateZ(-100px) scale(1.1);
+        }
+        .hero-content {
+            text-align: center; z-index: 2; transform-style: preserve-3d;
+        }
+        .hero h1 {
+            font-size: clamp(4rem, 12vw, 9rem); font-weight: 800; line-height: 1; letter-spacing: -0.03em;
+            text-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateZ(60px);
+            background: linear-gradient(180deg, #ffffff 0%, #a3a3a3 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem; color: var(--text-dim); margin: 2rem 0 3.5rem; letter-spacing: 0.3rem; text-transform: uppercase; transform: translateZ(40px);
+        }
+        .btn-primary {
+            display: inline-block; padding: 1.2rem 3.5rem; background: var(--text); color: var(--bg);
+            font-family: 'Outfit', sans-serif; font-weight: 700; text-decoration: none; letter-spacing: 0.1rem;
+            border-radius: 2px; transition: transform 0.3s, box-shadow 0.3s; transform: translateZ(50px);
+            position: relative; overflow: hidden;
+        }
+        .btn-primary::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:hover {
+            transform: translateZ(50px) scale(1.05); box-shadow: 0 15px 40px rgba(255,255,255,0.25);
+        }
+
+        /* Products Grid */
+        .section { padding: 10rem 4rem; }
+        .section-title { font-size: 3.5rem; text-align: center; margin-bottom: 6rem; letter-spacing: 0.15rem; }
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3rem; max-width: 1400px; margin: 0 auto;
+        }
+        .card-container {
+            perspective: 1200px; height: 500px;
+        }
+        .card {
+            width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.1s;
+            border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface);
+            cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .card-img-wrap {
+            width: 100%; height: 100%; position: absolute; inset: 0; transform: translateZ(0); overflow: hidden;
+        }
+        .card img {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card:hover img { opacity: 1; transform: scale(1.08); }
+        .card-content {
+            position: absolute; bottom: 0; width: 100%; padding: 2.5rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+            transform: translateZ(40px); pointer-events: none;
+        }
+        .card h3 { font-size: 1.8rem; margin-bottom: 0.5rem; letter-spacing: 0.05rem; }
+        .card p { color: var(--text-dim); font-size: 1rem; font-weight: 300; }
+
+        /* Vision Section */
+        .vision {
+            display: flex; align-items: center; justify-content: center; min-height: 90vh;
+            background: radial-gradient(circle at center, #111 0%, #000 100%); padding: 4rem; position: relative; overflow: hidden;
+        }
+        .vision-text {
+            font-size: clamp(2rem, 4vw, 4.5rem); font-family: 'Outfit', sans-serif; font-weight: 500; line-height: 1.3;
+            text-align: center; max-width: 1200px; z-index: 2;
+        }
+        .char { opacity: 0.15; transition: opacity 0.1s; }
+
+        /* Footer */
+        footer {
+            padding: 5rem 4rem; border-top: 1px solid var(--border); background: #000;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 3rem;
+        }
+        .footer-brand { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.05em; }
+        .footer-links { display: flex; gap: 2.5rem; }
+        .footer-links a { color: var(--text-dim); text-decoration: none; font-size: 0.95rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1rem; transition: color 0.3s; }
+        .footer-links a:hover { color: var(--text); }
+        
+        @media (max-width: 768px) {
+            nav { padding: 1.5rem; }
+            nav ul { display: none; }
+            .section { padding: 6rem 1.5rem; }
+            .footer-links { flex-direction: column; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="preloader">
+        <div class="preloader-text">RNVN</div>
+    </div>
+
+    <nav>
+        <a href="#" class="logo">RNVN</a>
+        <ul>
+            <li><a href="#collection">Collection</a></li>
+            <li><a href="#vision">Vision</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-content" id="heroContent">
+            <h1>RNVN OFFICIAL</h1>
+            <p>Unrecognized. Unrivaled.</p>
+            <a href="https://vt.tiktok.com/ZSHKqtkr8/?page=Mall" target="_blank" class="btn-primary">EXPLORE THE DROP</a>
+        </div>
+    </section>
+
+    <section id="collection" class="section">
+        <h2 class="section-title">LATEST ARCHIVE</h2>
+        <div class="grid">
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-img-wrap"><img src="rnvn4.png" alt="BOXY"></div>
+                    <div class="card-content">
+                        <h3>BOXY FIT</h3>
+                        <p>Signature Cut</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-img-wrap"><img src="IMG_8767.JPG.jpeg" alt="OVERSIZED"></div>
+                    <div class="card-content">
+                        <h3>OVERSIZED</h3>
+                        <p>Urban Silhouette</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-img-wrap"><img src="panjang (1).png" alt="Size chart boxy"></div>
+                    <div class="card-content">
+                        <h3>BOXY SIZE GUIDE</h3>
+                        <p>Perfect Proportions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-img-wrap"><img src="tshirts rnvn.png" alt="T-shirt"></div>
+                    <div class="card-content">
+                        <h3>CLASSIC TEE</h3>
+                        <p>Everyday Essential</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-img-wrap"><img src="IMG_8789.JPG.jpeg" alt="T-shirt"></div>
+                    <div class="card-content">
+                        <h3>HEAVYWEIGHT TEE</h3>
+                        <p>Premium Cotton</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-img-wrap"><img src="panjang (2).png" alt="Size Chart T-shirt"></div>
+                    <div class="card-content">
+                        <h3>TEE SIZE GUIDE</h3>
+                        <p>Find Your Fit</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="vision" class="vision">
+        <div class="vision-text" id="visionText">
+            Crafted for those who think differently, move with purpose, and refuse to follow trends. Tak dikenal. Tak tertandingi.
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-brand">RNVN.</div>
+        <div class="footer-links">
+            <a href="https://vt.tiktok.com/ZSHKqtkr8/?page=Mall" target="_blank">TikTok Shop</a>
+            <a href="https://wa.me/628123456789" target="_blank">WhatsApp</a>
+            <a href="https://instagram.com/rnvn.official" target="_blank">Instagram</a>
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const tl = gsap.timeline();
+        tl.to(".preloader-text", { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", y: 0, duration: 1.2, ease: "power4.out", delay: 0.2 })
+          .to(".preloader-text", { opacity: 0, duration: 0.5, delay: 0.8 })
+          .to(".preloader", { y: "-100%", duration: 1, ease: "power4.inOut" }, "-=0.3");
+
+        const hero = document.querySelector('.hero');
+        const heroContent = document.getElementById('heroContent');
+        const heroBg = document.getElementById('heroBg');
+
+        hero.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 20;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 20;
+            heroContent.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            heroBg.style.transform = `translateZ(-100px) scale(1.1) translateX(${xAxis * 0.4}px) translateY(${yAxis * 0.4}px)`;
+        });
+
+        hero.addEventListener('mouseleave', () => {
+            heroContent.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            heroContent.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            heroBg.style.transform = `translateZ(-100px) scale(1.1) translateX(0px) translateY(0px)`;
+            heroBg.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            setTimeout(() => {
+                heroContent.style.transition = 'none';
+                heroBg.style.transition = 'none';
+            }, 600);
+        });
+
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -12;
+                const rotateY = ((x - centerX) / centerX) * 12;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+                card.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+                setTimeout(() => { card.style.transition = 'transform 0.1s'; }, 600);
+            });
+        });
+
+        const text = document.getElementById('visionText');
+        const chars = text.textContent.split('').map(char => char === ' ' ? '&nbsp;' : `<span class="char">${char}</span>`).join('');
+        text.innerHTML = chars;
+
+        gsap.to('.char', {
+            scrollTrigger: { trigger: '.vision', start: 'top 60%', end: 'bottom 80%', scrub: 1 },
+            opacity: 1, stagger: 0.1
+        });
+
+        gsap.utils.toArray('.card-container').forEach((container, i) => {
+            gsap.from(container, {
+                scrollTrigger: { trigger: container, start: 'top 85%' },
+                y: 60, opacity: 0, duration: 1, ease: 'power3.out', delay: i * 0.1
+            });
+        });
+    </script>
+</body>
+</html>
